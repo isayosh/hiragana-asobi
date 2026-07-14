@@ -4,7 +4,7 @@
 サーバーもインストールも不要です。
 
 **あそぶ → https://isayosh.github.io/hiragana-asobi/**
-（GitHub Pages を有効にすると上のURLで公開されます。リポジトリ名が変わった場合はURLも変わります）
+（GitHub Pages を有効にすると上のURLで公開されます）
 
 ## あそびかた
 

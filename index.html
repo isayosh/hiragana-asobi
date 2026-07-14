@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ひらがな あそび</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 50音表 -->
+<main id="grid-screen">
+  <h1>🌈 ひらがな あそび 🎈</h1>
+  <p class="hint">すきな もじを タッチしてね！</p>
+  <div id="kana-grid"></div>
+  <footer>
+    筆順データ: <a href="http://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>
+    (CC BY-SA 3.0)
+  </footer>
+</main>
+
+<!-- 文字の詳細 -->
+<section id="detail-screen" hidden>
+  <div class="detail-top">
+    <button id="back-btn" class="big-btn" aria-label="もどる">⬅ もどる</button>
+    <button id="sound-btn" class="big-btn" aria-label="おとをきく">🔊 おと</button>
+  </div>
+
+  <div class="stage-wrap">
+    <div id="stage">
+      <!-- 筆順SVGとなぞりがきキャンバスをここに重ねる -->
+    </div>
+    <div class="stage-buttons">
+      <button id="replay-btn" class="big-btn">▶️ かきじゅん</button>
+      <button id="clear-btn" class="big-btn">🧽 けす</button>
+    </div>
+    <p class="trace-hint">✏️ ゆびで なぞってみよう！</p>
+  </div>
+
+  <button id="example-card" aria-label="ことばをきく">
+    <span id="example-emoji"></span>
+    <span id="example-word"></span>
+    <span class="example-speaker">🔉</span>
+  </button>
+
+  <div class="nav-row">
+    <button id="prev-btn" class="big-btn">⬅ まえ</button>
+    <button id="next-btn" class="big-btn">つぎ ➡</button>
+  </div>
+</section>
+
+<script src="strokes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -14,7 +14,17 @@ const GRID_ROWS = [
   ["", "", "ん", "", ""],
 ];
 
-const KANA_LIST = GRID_ROWS.flat().filter(Boolean);
+// 濁音・半濁音（色は対応する清音の行に合わせる）
+const DAKUTEN_ROWS = [
+  ["が", "ぎ", "ぐ", "げ", "ご"],
+  ["ざ", "じ", "ず", "ぜ", "ぞ"],
+  ["だ", "ぢ", "づ", "で", "ど"],
+  ["ば", "び", "ぶ", "べ", "ぼ"],
+  ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"],
+];
+const DAKUTEN_ROW_CLASSES = [1, 2, 3, 5, 7];
+
+const KANA_LIST = [...GRID_ROWS.flat(), ...DAKUTEN_ROWS.flat()].filter(Boolean);
 
 // 使用例: [ことば, 絵文字, 読み上げテキスト]
 const EXAMPLES = {
@@ -64,6 +74,31 @@ const EXAMPLES = {
   "わ": ["わに", "🐊"],
   "を": ["ほんを よむ", "📖"],
   "ん": ["ぱん", "🍞"],
+  "が": ["がっこう", "🏫"],
+  "ぎ": ["ぎゅうにゅう", "🥛"],
+  "ぐ": ["ぐー", "✊"],
+  "げ": ["げんき", "💪"],
+  "ご": ["ごはん", "🍚"],
+  "ざ": ["ざりがに", "🦞"],
+  "じ": ["じてんしゃ", "🚲"],
+  "ず": ["ずぼん", "👖"],
+  "ぜ": ["ぜりー", "🍨"],
+  "ぞ": ["ぞう", "🐘"],
+  "だ": ["だんご", "🍡"],
+  "ぢ": ["はなぢ", "🩸"],
+  "づ": ["こづつみ", "📦"],
+  "で": ["でんしゃ", "🚃"],
+  "ど": ["どんぐり", "🌰"],
+  "ば": ["ばなな", "🍌"],
+  "び": ["びっくり", "😲"],
+  "ぶ": ["ぶた", "🐷"],
+  "べ": ["べんとう", "🍱"],
+  "ぼ": ["ぼうし", "👒"],
+  "ぱ": ["ぱんだ", "🐼"],
+  "ぴ": ["ぴかぴか", "✨"],
+  "ぷ": ["ぷりん", "🍮"],
+  "ぺ": ["ぺんぎん", "🐧"],
+  "ぽ": ["ぽすと", "📮"],
 };
 
 const STROKE_COLORS = ["#ff5d8f", "#4d96ff", "#38b000", "#ff9f1c", "#9d4edd"];
@@ -98,13 +133,18 @@ function markSeen(kana) {
 }
 
 function buildGrid() {
-  const grid = document.getElementById("kana-grid");
+  buildGridInto("kana-grid", GRID_ROWS, (rowIdx) => rowIdx);
+  buildGridInto("dakuten-grid", DAKUTEN_ROWS, (rowIdx) => DAKUTEN_ROW_CLASSES[rowIdx]);
+}
+
+function buildGridInto(gridId, rows, rowClassOf) {
+  const grid = document.getElementById(gridId);
   grid.textContent = "";
   const seen = loadSeen();
-  GRID_ROWS.forEach((row, rowIdx) => {
+  rows.forEach((row, rowIdx) => {
     row.forEach((kana) => {
       const cell = document.createElement("button");
-      cell.className = `kana-cell row-${rowIdx}`;
+      cell.className = `kana-cell row-${rowClassOf(rowIdx)}`;
       if (!kana) {
         cell.classList.add("empty");
         cell.disabled = true;

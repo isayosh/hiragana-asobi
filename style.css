@@ -225,3 +225,17 @@ footer a {
   display: flex;
   justify-content: space-between;
 }
+
+.section-hint {
+  margin-top: 22px;
+}
+
+#dakuten-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+#detail-screen[hidden] {
+  display: none;
+}

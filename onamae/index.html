@@ -32,8 +32,8 @@
   </div>
   <p class="trace-hint">✏️ ゆびで なぞって おなまえを かいてみよう！</p>
 
-  <!-- １もじずつ きく -->
-  <p class="hint">タッチすると よみかたが きけるよ</p>
+  <!-- １もじずつ おおきく れんしゅう -->
+  <p class="hint">🔍 もじを タッチすると おおきく なぞれるよ</p>
   <div id="char-chips"></div>
 
   <footer>
@@ -41,6 +41,29 @@
     (CC BY-SA 3.0)
   </footer>
 </main>
+
+<!-- １もじを おおきく れんしゅうする がめん -->
+<section id="char-screen" hidden>
+  <div class="detail-top">
+    <button id="detail-back" class="big-btn">⬅ もどる</button>
+    <button id="detail-sound" class="big-btn">🔊 おと</button>
+  </div>
+
+  <div class="big-stage-wrap">
+    <div id="big-stage"></div>
+    <div class="stage-buttons">
+      <button id="detail-replay" class="big-btn">▶️ かきじゅん</button>
+      <button id="detail-clear" class="big-btn">🧽 けす</button>
+    </div>
+    <p class="trace-hint">✏️ おおきく なぞってみよう！</p>
+  </div>
+
+  <div class="nav-row">
+    <button id="detail-prev" class="big-btn">⬅ まえ</button>
+    <span id="detail-pos" class="detail-pos"></span>
+    <button id="detail-next" class="big-btn">つぎ ➡</button>
+  </div>
+</section>
 
 <script src="../strokes.js"></script>
 <script src="app.js"></script>

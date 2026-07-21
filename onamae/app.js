@@ -149,7 +149,7 @@ function buildSheet() {
 
   const canvas = document.createElement("canvas");
   sheet.appendChild(canvas);
-  sheet._clearTrace = setupTraceCanvas(canvas);
+  sheet._clearTrace = setupTraceCanvas(canvas, sheet);
 }
 
 function groupAt(ox, oy) {
@@ -202,10 +202,10 @@ function playAnimation() {
 
 /* ---------- なぞりがきキャンバス ---------- */
 
-function setupTraceCanvas(canvas) {
+function setupTraceCanvas(canvas, container) {
   const dpr = window.devicePixelRatio || 1;
-  const w = sheet.clientWidth;
-  const h = sheet.clientHeight;
+  const w = container.clientWidth;
+  const h = container.clientHeight;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   const ctx = canvas.getContext("2d");
@@ -251,6 +251,155 @@ function setupTraceCanvas(canvas) {
   };
 }
 
+/* ---------- １もじを おおきく れんしゅう ---------- */
+
+const bigStage = document.getElementById("big-stage");
+const charScreen = document.getElementById("char-screen");
+let bigAnimToken = 0;
+let currentIndex = 0;
+
+function buildBigStage(kana) {
+  bigStage.textContent = "";
+  const data = STROKE_DATA[kana];
+
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 109 109");
+
+  // うすい下書き
+  const ghost = document.createElementNS(SVG_NS, "g");
+  ghost.setAttribute(
+    "style",
+    "fill:none;stroke:#e0d8c8;stroke-width:8;stroke-linecap:round;stroke-linejoin:round"
+  );
+  data.strokes.forEach((d) => {
+    const p = document.createElementNS(SVG_NS, "path");
+    p.setAttribute("d", d);
+    ghost.appendChild(p);
+  });
+  svg.appendChild(ghost);
+
+  // 色つき（アニメーション対象）
+  const animPaths = data.strokes.map((d, i) => {
+    const p = document.createElementNS(SVG_NS, "path");
+    p.setAttribute("d", d);
+    p.setAttribute(
+      "style",
+      `fill:none;stroke:${STROKE_COLORS[i % STROKE_COLORS.length]};` +
+        "stroke-width:7;stroke-linecap:round;stroke-linejoin:round"
+    );
+    svg.appendChild(p);
+    return p;
+  });
+
+  // 画数バッジ
+  const badges = data.numbers.map(([x, y], i) => {
+    const g = document.createElementNS(SVG_NS, "g");
+    g.setAttribute("visibility", "hidden");
+    const c = document.createElementNS(SVG_NS, "circle");
+    c.setAttribute("cx", x);
+    c.setAttribute("cy", y - 3);
+    c.setAttribute("r", 8);
+    c.setAttribute("fill", STROKE_COLORS[i % STROKE_COLORS.length]);
+    const t = document.createElementNS(SVG_NS, "text");
+    t.setAttribute("x", x);
+    t.setAttribute("y", y);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("font-size", "10");
+    t.setAttribute("font-weight", "bold");
+    t.setAttribute("fill", "#fff");
+    t.textContent = String(i + 1);
+    g.append(c, t);
+    svg.appendChild(g);
+    return g;
+  });
+
+  bigStage.appendChild(svg);
+  bigStage._parts = { animPaths, badges };
+
+  const canvas = document.createElement("canvas");
+  bigStage.appendChild(canvas);
+  bigStage._clearTrace = setupTraceCanvas(canvas, bigStage);
+}
+
+function playBigAnimation() {
+  const token = ++bigAnimToken;
+  const { animPaths, badges } = bigStage._parts;
+
+  animPaths.forEach((p) => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  badges.forEach((g) => g.setAttribute("visibility", "hidden"));
+
+  let i = 0;
+
+  function drawNext() {
+    if (token !== bigAnimToken || i >= animPaths.length) return;
+    const path = animPaths[i];
+    badges[i].setAttribute("visibility", "visible");
+    const len = path.getTotalLength();
+    const duration = Math.max(450, len * 14);
+    const start = performance.now();
+
+    function frame(now) {
+      if (token !== bigAnimToken) return;
+      const t = Math.min(1, (now - start) / duration);
+      path.style.strokeDashoffset = len * (1 - t);
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        i += 1;
+        setTimeout(() => requestAnimationFrame(drawNext), 380);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(drawNext);
+}
+
+function openChar(index) {
+  currentIndex = (index + CHARS.length) % CHARS.length;
+  const kana = CHARS[currentIndex];
+  document.getElementById("detail-pos").textContent = kana;
+  charScreen.hidden = false;
+  document.getElementById("app").hidden = true;
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => {
+    buildBigStage(kana);
+    playBigAnimation();
+  });
+  speak(kana);
+}
+
+function closeChar() {
+  bigAnimToken++;
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  charScreen.hidden = true;
+  document.getElementById("app").hidden = false;
+  // 名前シートを組み直す（キャンバス実寸を取り直すため）
+  requestAnimationFrame(buildSheet);
+}
+
+document.getElementById("detail-back").addEventListener("click", closeChar);
+document.getElementById("detail-sound").addEventListener("click", () =>
+  speak(CHARS[currentIndex])
+);
+document.getElementById("detail-replay").addEventListener("click", () => {
+  if (bigStage._clearTrace) bigStage._clearTrace();
+  playBigAnimation();
+});
+document.getElementById("detail-clear").addEventListener("click", () => {
+  if (bigStage._clearTrace) bigStage._clearTrace();
+});
+document.getElementById("detail-prev").addEventListener("click", () =>
+  openChar(currentIndex - 1)
+);
+document.getElementById("detail-next").addEventListener("click", () =>
+  openChar(currentIndex + 1)
+);
+
 /* ---------- モードきりかえ ---------- */
 
 function setOrientation(next) {
@@ -272,11 +421,11 @@ function setOrientation(next) {
 document.getElementById("name-big").textContent = NAME;
 
 const chipRow = document.getElementById("char-chips");
-CHARS.forEach((kana) => {
+CHARS.forEach((kana, i) => {
   const chip = document.createElement("button");
   chip.className = "char-chip";
   chip.textContent = kana;
-  chip.addEventListener("click", () => speak(kana));
+  chip.addEventListener("click", () => openChar(i));
   chipRow.appendChild(chip);
 });
 
@@ -300,8 +449,13 @@ let resizeTimer = null;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    animToken++;
-    buildSheet();
+    if (!charScreen.hidden) {
+      bigAnimToken++;
+      buildBigStage(CHARS[currentIndex]);
+    } else {
+      animToken++;
+      buildSheet();
+    }
   }, 200);
 });
 

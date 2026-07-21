@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>おなまえ れんしゅうちょう</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="app">
+  <a class="home-link" href="../">⬅ ひらがな あそび</a>
+
+  <h1>✏️ おなまえ れんしゅう</h1>
+  <p class="name-big" id="name-big"></p>
+
+  <!-- たて / よこ の きりかえ -->
+  <div class="mode-row" role="group" aria-label="かきかたの きりかえ">
+    <button id="mode-yoko" class="mode-btn is-on">よこがき ➡</button>
+    <button id="mode-tate" class="mode-btn">たてがき ⬇</button>
+  </div>
+
+  <!-- れんしゅうシート -->
+  <div class="sheet-wrap">
+    <div id="sheet" class="horizontal"></div>
+  </div>
+
+  <div class="tool-row">
+    <button id="replay-btn" class="big-btn">▶️ かきじゅん</button>
+    <button id="name-sound-btn" class="big-btn">🔊 おなまえ</button>
+    <button id="clear-btn" class="big-btn">🧽 けす</button>
+  </div>
+  <p class="trace-hint">✏️ ゆびで なぞって おなまえを かいてみよう！</p>
+
+  <!-- １もじずつ きく -->
+  <p class="hint">タッチすると よみかたが きけるよ</p>
+  <div id="char-chips"></div>
+
+  <footer>
+    筆順データ: <a href="http://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>
+    (CC BY-SA 3.0)
+  </footer>
+</main>
+
+<script src="../strokes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

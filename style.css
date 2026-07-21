@@ -239,3 +239,18 @@ footer a {
 #detail-screen[hidden] {
   display: none;
 }
+
+.onamae-link {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 4px;
+  font-size: clamp(0.95rem, 3.6vw, 1.15rem);
+  font-weight: bold;
+  color: #5a8f3f;
+  text-decoration: none;
+  background: #fff;
+  border: 3px solid #bfe6a6;
+  border-radius: 999px;
+  padding: 8px 18px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+}

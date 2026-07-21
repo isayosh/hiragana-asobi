@@ -2,8 +2,13 @@
 
 const NAME = "いさじつむぎ";
 const CHARS = [...NAME];
-// 発音のときは 名字「いさじ」と 名前「つむぎ」を くぎって よむ
-const NAME_PARTS = ["いさじ", "つむぎ"];
+// 発音のときの 抑揚の つけかた
+// 「いさじ」…ひくく かるく／間をあけて／「つむぎ」…たかく あがるように
+const NAME_PARTS = [
+  { text: "いさじ", pitch: 0.8, volume: 0.85 },
+  { text: "つむぎ", pitch: 1.4, volume: 1.0 },
+];
+const NAME_PAUSE_MS = 450; // 名字と名前の あいだの ま
 const CELL = 109; // KanjiVG の 1文字ぶんの viewBox
 
 const STROKE_COLORS = ["#ff5d8f", "#4d96ff", "#38b000", "#ff9f1c", "#9d4edd", "#00b4d8"];
@@ -43,11 +48,28 @@ function speak(text) {
   speechSynthesis.speak(utterance(text));
 }
 
-// おなまえは 名字と名前を べつべつに よみあげて 抑揚を しぜんにする
+// おなまえは 名字と名前を くぎって、それぞれ たかさ・おおきさ・間を つけて よむ
+let nameSpeakToken = 0;
+
 function speakName() {
   if (!("speechSynthesis" in window)) return;
+  const token = ++nameSpeakToken;
   speechSynthesis.cancel();
-  NAME_PARTS.forEach((part) => speechSynthesis.speak(utterance(part)));
+  speakNamePart(0, token);
+}
+
+function speakNamePart(i, token) {
+  if (token !== nameSpeakToken || i >= NAME_PARTS.length) return;
+  const part = NAME_PARTS[i];
+  const u = utterance(part.text);
+  if (part.pitch != null) u.pitch = part.pitch;
+  if (part.volume != null) u.volume = part.volume;
+  u.onend = () => {
+    if (token === nameSpeakToken && i + 1 < NAME_PARTS.length) {
+      setTimeout(() => speakNamePart(i + 1, token), NAME_PAUSE_MS);
+    }
+  };
+  speechSynthesis.speak(u);
 }
 
 /* ---------- れんしゅうシートの組み立て ---------- */

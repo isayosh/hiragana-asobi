@@ -29,6 +29,7 @@
     <button id="replay-btn" class="big-btn">▶️ かきじゅん</button>
     <button id="name-sound-btn" class="big-btn">🔊 おなまえ</button>
     <button id="clear-btn" class="big-btn">🧽 けす</button>
+    <button id="sheet-done" class="big-btn done-btn">🌸 できた！</button>
   </div>
   <p class="trace-hint">✏️ ゆびで なぞって おなまえを かいてみよう！</p>
 
@@ -54,6 +55,7 @@
     <div class="stage-buttons">
       <button id="detail-replay" class="big-btn">▶️ かきじゅん</button>
       <button id="detail-clear" class="big-btn">🧽 けす</button>
+      <button id="detail-done" class="big-btn done-btn">🌸 できた！</button>
     </div>
     <p class="trace-hint">✏️ おおきく なぞってみよう！</p>
   </div>
@@ -64,6 +66,16 @@
     <button id="detail-next" class="big-btn">つぎ ➡</button>
   </div>
 </section>
+
+<!-- ごほうび（花丸＋紙吹雪）の えんしゅつ -->
+<div id="celebrate" class="celebrate" hidden>
+  <canvas id="confetti"></canvas>
+  <div class="celebrate-card">
+    <div class="hanamaru">💮</div>
+    <p class="celebrate-text">よくできたね！</p>
+    <button id="celebrate-close" class="big-btn">🙌 もういちど</button>
+  </div>
+</div>
 
 <script src="../strokes.js"></script>
 <script src="app.js"></script>

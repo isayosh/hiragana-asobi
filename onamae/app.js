@@ -435,6 +435,92 @@ document.getElementById("detail-next").addEventListener("click", () =>
   openChar(currentIndex + 1)
 );
 
+/* ---------- ごほうび（花丸＋紙吹雪） ---------- */
+
+const CONFETTI_COLORS = [
+  "#ff5d8f", "#4d96ff", "#38b000", "#ff9f1c", "#9d4edd", "#00b4d8", "#ffd166",
+];
+let stopConfetti = null;
+
+function runConfetti(canvas, durationMs) {
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+
+  const pieces = Array.from({ length: 140 }, (_, i) => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    w: (6 + Math.random() * 8) * dpr,
+    h: (8 + Math.random() * 10) * dpr,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    vx: (-1 + Math.random() * 2) * dpr,
+    vy: (2 + Math.random() * 3) * dpr,
+    rot: Math.random() * Math.PI,
+    vr: -0.2 + Math.random() * 0.4,
+  }));
+
+  const start = performance.now();
+  let raf;
+
+  function frame(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pieces) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.03 * dpr; // じゅうりょく
+      p.rot += p.vr;
+      if (p.y > canvas.height + 20 * dpr) {
+        p.y = -20 * dpr;
+        p.x = Math.random() * canvas.width;
+      }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    if (now - start < durationMs) {
+      raf = requestAnimationFrame(frame);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  raf = requestAnimationFrame(frame);
+
+  return () => {
+    cancelAnimationFrame(raf);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+}
+
+function celebrate() {
+  const overlay = document.getElementById("celebrate");
+  overlay.hidden = false;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (stopConfetti) stopConfetti();
+  stopConfetti = reduce ? null : runConfetti(document.getElementById("confetti"), 2600);
+  speak("よくできました！");
+}
+
+function closeCelebrate() {
+  document.getElementById("celebrate").hidden = true;
+  if (stopConfetti) {
+    stopConfetti();
+    stopConfetti = null;
+  }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+
+document.getElementById("sheet-done").addEventListener("click", celebrate);
+document.getElementById("detail-done").addEventListener("click", celebrate);
+document.getElementById("celebrate-close").addEventListener("click", closeCelebrate);
+document.getElementById("celebrate").addEventListener("click", (e) => {
+  // カードの外（背景）を タッチしても とじる
+  if (e.target.id === "celebrate" || e.target.id === "confetti") closeCelebrate();
+});
+
 /* ---------- モードきりかえ ---------- */
 
 function setOrientation(next) {

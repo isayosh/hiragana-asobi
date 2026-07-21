@@ -2,6 +2,8 @@
 
 const NAME = "いさじつむぎ";
 const CHARS = [...NAME];
+// 発音のときは 名字「いさじ」と 名前「つむぎ」を くぎって よむ
+const NAME_PARTS = ["いさじ", "つむぎ"];
 const CELL = 109; // KanjiVG の 1文字ぶんの viewBox
 
 const STROKE_COLORS = ["#ff5d8f", "#4d96ff", "#38b000", "#ff9f1c", "#9d4edd", "#00b4d8"];
@@ -26,15 +28,26 @@ if ("speechSynthesis" in window) {
   speechSynthesis.addEventListener("voiceschanged", pickVoice);
 }
 
-function speak(text) {
-  if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
+function utterance(text) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "ja-JP";
   if (jaVoice) u.voice = jaVoice;
   u.rate = 0.8;
   u.pitch = 1.1;
-  speechSynthesis.speak(u);
+  return u;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance(text));
+}
+
+// おなまえは 名字と名前を べつべつに よみあげて 抑揚を しぜんにする
+function speakName() {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  NAME_PARTS.forEach((part) => speechSynthesis.speak(utterance(part)));
 }
 
 /* ---------- れんしゅうシートの組み立て ---------- */
@@ -439,7 +452,7 @@ document.getElementById("replay-btn").addEventListener("click", () => {
   if (sheet._clearTrace) sheet._clearTrace();
   playAnimation();
 });
-document.getElementById("name-sound-btn").addEventListener("click", () => speak(NAME));
+document.getElementById("name-sound-btn").addEventListener("click", speakName);
 document.getElementById("clear-btn").addEventListener("click", () => {
   if (sheet._clearTrace) sheet._clearTrace();
 });
